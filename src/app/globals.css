@@ -1,0 +1,40 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  background: #0C0E14;
+  color: #F0EFE8;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: #0C0E14; }
+::-webkit-scrollbar-thumb { background: #252830; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #333640; }
+
+select option { background: #13151E; color: #F0EFE8; }
+
+input::placeholder,
+textarea::placeholder { color: #636360; }
+
+button { font-family: inherit; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.96) translateY(4px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0);    }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
