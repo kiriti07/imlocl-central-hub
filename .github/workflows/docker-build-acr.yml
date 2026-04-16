@@ -1,0 +1,30 @@
+name: Docker Build and Push to ACR
+
+on:
+  push:
+    branches: [feature/PDM-5]
+  workflow_dispatch:
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Docker login to ACR
+        uses: azure/docker-login@v2
+        with:
+          login-server: devacr123456.azurecr.io
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Build image
+        run: docker build -t imlocl-central-hub .
+
+      - name: Tag image
+        run: docker tag imlocl-central-hub devacr123456.azurecr.io/imlocl-central-hub:v1
+
+      - name: Push image
+        run: docker push devacr123456.azurecr.io/imlocl-central-hub:v1
