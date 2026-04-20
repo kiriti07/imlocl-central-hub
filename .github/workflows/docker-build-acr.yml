@@ -1,30 +1,52 @@
-name: Docker Build and Push to ACR
+name: Docker Build, Push to ACR, and Deploy to Azure Container App
 
 on:
   push:
     branches: [feature/PDM-5]
   workflow_dispatch:
 
+env:
+  REGISTRY: devacr123456.azurecr.io
+  IMAGE_NAME: imlocl-central-hub
+  CONTAINER_APP_NAME: local-hub
+  RESOURCE_GROUP: dev-rg
+
 jobs:
   docker:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Azure login
+        uses: azure/login@v3
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
       - name: Docker login to ACR
         uses: azure/docker-login@v2
         with:
-          login-server: devacr123456.azurecr.io
+          login-server: ${{ env.REGISTRY }}
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
       - name: Build image
-        run: docker build -t imlocl-central-hub .
+        run: docker build -t $IMAGE_NAME .
 
       - name: Tag image
-        run: docker tag imlocl-central-hub devacr123456.azurecr.io/imlocl-central-hub:v1
+        run: docker tag $IMAGE_NAME $REGISTRY/$IMAGE_NAME:${{ github.sha }}
 
       - name: Push image
-        run: docker push devacr123456.azurecr.io/imlocl-central-hub:v1
+        run: docker push $REGISTRY/$IMAGE_NAME:${{ github.sha }}
+
+      - name: Deploy to Azure Container App
+        uses: azure/container-apps-deploy-action@v1
+        with:
+          resourceGroup: ${{ env.RESOURCE_GROUP }}
+          containerAppName: ${{ env.CONTAINER_APP_NAME }}
+          imageToDeploy: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
