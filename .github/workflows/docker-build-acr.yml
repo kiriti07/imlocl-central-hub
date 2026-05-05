@@ -54,13 +54,13 @@ jobs:
 
       - name: Update image tag in deployment.yaml
         run: |
-          sed -i "s|devacr123456.azurecr.io/imlocl-central-hub:.*|${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}|g" deployment.yaml
+          sed -i "s|devacr123456.azurecr.io/imlocl-central-hub:.*|${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}|g" kubernetes/deployment.yaml
 
       - name: Deploy to AKS
         run: |
-          kubectl apply -f namespace.yaml
-          kubectl apply -f deployment.yaml
-          kubectl apply -f service.yaml
+          kubectl apply -f kubernetes/namespace.yaml
+          kubectl apply -f kubernetes/deployment.yaml
+          kubectl apply -f kubernetes/service.yaml
 
       - name: Verify deployment
         run: |
