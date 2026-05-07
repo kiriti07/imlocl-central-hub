@@ -46,11 +46,17 @@ jobs:
       - name: Push image
         run: docker push $REGISTRY/$IMAGE_NAME:${{ github.sha }}
 
-      - name: Set AKS context
-        uses: azure/aks-set-context@v4
-        with:
-          resource-group: ${{ env.RESOURCE_GROUP }}
-          cluster-name: ${{ env.AKS_CLUSTER_NAME }}
+      - name: Get AKS credentials
+        run: |
+          az aks get-credentials \
+            --resource-group $RESOURCE_GROUP \
+            --name $AKS_CLUSTER_NAME \
+            --overwrite-existing
+
+      - name: Verify AKS connection
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
 
       - name: Update image tag in deployment.yaml
         run: |
